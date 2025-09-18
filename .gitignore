@@ -1,0 +1,7 @@
+# Ignore Windows shortcuts and installers
+*.lnk
+*.url
+*.exe
+# Node/others (in case you add things later)
+node_modules/
+dist/

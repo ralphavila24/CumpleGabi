@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎂 ¡Feliz Cumple!</title>
+  <meta name="description" content="Un detalle de cumpleaños hecho con mucho cariño." />
+  <meta name="theme-color" content="#ff7ac3" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{ --bg1:#1a1b2e; --bg2:#2a2359; --ac:#ff7ac3; --ac2:#ffd166; --text:#f7f7fb; --muted:#b7b7c9; }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{ margin:0; font-family:"Poppins", system-ui; color:var(--text); background: linear-gradient(160deg, var(--bg1), var(--bg2)); overflow-x:hidden; }
+    .wrap{max-width:980px;margin:0 auto;padding:18px;}
+    header{display:flex;align-items:center;gap:12px;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo .bubble{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--ac),#ff4d9d);display:grid;place-items:center;box-shadow:0 10px 25px rgba(255,122,195,.35)}
+    .logo span{font-weight:800;letter-spacing:.5px}
+
+    .hero{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;margin:22px 0 8px}
+    .card{border-radius:22px;background:rgba(255,255,255,.06);backdrop-filter: blur(6px); box-shadow:0 10px 30px rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.09)}
+    .hero .greet{padding:22px 22px 6px}
+    .kicker{font-size:.9rem;color:var(--muted)}
+    h1{font-size:clamp(28px,5vw,48px);margin:.2em 0 .1em;line-height:1.05}
+    .type{min-height:2.2em;display:block;color:var(--ac2);font-weight:600}
+
+    .datebar{display:flex;gap:12px;flex-wrap:wrap;padding:14px 18px;border-top:1px dashed rgba(255,255,255,.18);align-items:center;}
+    .pill{border:1px solid rgba(255,255,255,.18);padding:6px 10px;border-radius:999px;font-size:.85rem;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0}
+    @media (max-width:850px){.grid{grid-template-columns:1fr;}}
+    .tile{padding:16px;position:relative;overflow:hidden}
+    .tile h3{margin:4px 0 6px;font-size:1.1rem}
+    .tile p{margin:0;color:var(--muted)}
+    .tile .icon{font-size:28px}
+
+    footer{padding:22px;text-align:center;color:var(--muted);position:relative}
+    /* Enlace "oculto" */
+    .easter{font-size:.78rem;opacity:.28;position:absolute;right:10px;bottom:10px;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.18);transition:opacity .2s}
+    .easter:focus,.easter:hover{opacity:.55}
+
+    #confetti{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .hero,.grid,footer{position:relative;z-index:1}
+
+    /* Vista sorpresa de imagen a pantalla completa */
+    .surprise{min-height:100vh;display:grid;place-items:center;padding:12px}
+    .surprise img{max-width:100%;max-height:85vh;border-radius:18px;border:1px solid rgba(255,255,255,.15);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+    .back{margin-top:12px;display:inline-block;font-weight:600;text-decoration:none;background:var(--ac2);color:#21152b;padding:8px 12px;border-radius:12px}
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="wrap" id="app">
+    <header>
+      <div class="logo">
+        <div class="bubble">🎉</div>
+        <span>Para Gabi, con cariño</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="card greet">
+        <div class="kicker">Hoy celebramos ✨</div>
+        <h1>¡Feliz cumpleaños, Gabi! 🥳</h1>
+        <span class="type" id="typewriter"></span>
+
+        <div class="datebar">
+          <span class="pill" id="today"></span>
+          <span class="pill">Hecho con 💖 en HTML + JS</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card tile">
+        <div class="icon">💌</div>
+        <h3>Un mensajito</h3>
+        <p id="msg">
+          Gracias por ser luz, risas y compañía. Que este año te traiga aventuras bonitas, salud y muchos sueños cumplidos. 🌟
+        </p>
+      </article>
+
+      <article class="card tile">
+        <div class="icon">🎁</div>
+        <h3>Deseos</h3>
+        <p>
+          Hoy deseo que todo lo que te haga sonreír, se multiplique. Si quieres, escribe aquí tus propios deseos y metas ✍️
+        </p>
+        <textarea id="wishes" placeholder="Escribe tus deseos aquí..." style="width:100%;height:100px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--text);padding:10px;resize:vertical"></textarea>
+      </article>
+    </section>
+
+    <footer>
+      Hecho con cariño por alguien que te aprecia · <span id="year"></span>
+      <!-- Enlace pequeñín y discreto -->
+      <a href="#" class="easter" id="easter" title="Nada que ver por aquí…">haz clic aquí</a>
+    </footer>
+  </div>
+
+  <script>
+    // ===== Utilidades básicas
+    const $ = (q)=>document.querySelector(q);
+    const fmt = (n)=>n.toString().padStart(2,'0');
+    const params = new URLSearchParams(location.search);
+
+    // ===== Modo sorpresa (una sola página)
+    // Si la URL trae ?s=1&img=URL, mostramos pantalla con la imagen en grande
+    if(params.get('s')==='1'){
+      const src = params.get('img') || 'media/sorpresa.png'; // cambia por tu imagen
+      document.body.innerHTML = `
+        <div class="surprise">
+          <div style="text-align:center">
+            <img src="${src}" alt="Sorpresa"/>
+            <div><a class="back" href="${location.pathname}">Volver</a></div>
+          </div>
+        </div>`;
+    }
+
+    // ===== Página normal
+    const now = new Date();
+    const today = $('#today');
+    if(today){ today.textContent = `Hoy es ${fmt(now.getDate())}/${fmt(now.getMonth()+1)}/${now.getFullYear()}`; }
+    const y = $('#year'); if(y) y.textContent = new Date().getFullYear();
+
+    // Mensajes personalizados (typewriter)
+    const messages = [
+      'Espero que la pases super bien en tu cumple.',
+      'Estudiar ingenieria sirvió de algo.',
+      'Deberiamos cocinar cuando vuelvas, me dio hambre hacer esto.',
+      'Seguro estas ahí esperando ver todos los mensajes',
+      'Ya puedes cerrar la pagina, no hay mas nada',
+      '¿Qué vendra primero, tú a Barranquilla o mi calvicie??',
+      'Que buena forma de gastar mi tiempo hoy.',
+      'No hay nada mas en la pagina, ya puedes cerrar ;)'
+    ];
+
+    let ti=0, ci=0; const tw = $('#typewriter');
+    function type(){
+      if(!tw) return; // si estamos en modo sorpresa, no hay tw
+      const m = messages[ti];
+      tw.textContent = m.slice(0, ++ci);
+      if(ci<=m.length){ setTimeout(type, 40); }
+      else { setTimeout(()=>{ci=0;ti=(ti+1)%messages.length;type();}, 1600); }
+    }
+    type();
+
+    // Confetti
+    const canvas = document.getElementById('confetti');
+    if(canvas){
+      const ctx = canvas.getContext('2d');
+      let W,H,particles=[]; const colors=['#ff7ac3','#ffd166','#7afcff','#fff38a','#bdb2ff'];
+      function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; }
+      window.addEventListener('resize', resize); resize();
+      function spawn(n=120){
+        for(let i=0;i<n;i++){
+          particles.push({ x: Math.random()*W, y: -20-Math.random()*H*0.5, r: 4+Math.random()*5, c: colors[(Math.random()*colors.length)|0], vy: 2+Math.random()*3, vx: (Math.random()-.5)*2, rot: Math.random()*Math.PI, vr: (Math.random()-.5)*0.2 });
+        }
+      }
+      function step(){
+        ctx.clearRect(0,0,W,H);
+        for(const p of particles){ p.vy += 0.01; p.x += p.vx; p.y += p.vy; p.rot += p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.fillRect(-p.r, -p.r*0.5, p.r*2, p.r); ctx.restore(); }
+        particles = particles.filter(p=>p.y<H+20);
+        requestAnimationFrame(step);
+      }
+      spawn(180); step();
+      window.addEventListener('click',()=>spawn(60));
+      window.addEventListener('scroll',()=>spawn(20));
+    }
+
+    // Guardado de deseos en localStorage
+    const WKEY = `wishes-Gabi`;
+    const wishes = $('#wishes');
+    if(wishes){
+      wishes.value = localStorage.getItem(WKEY)||'';
+      wishes.addEventListener('input', ()=>localStorage.setItem(WKEY, wishes.value));
+    }
+
+    // Enlace escondido: al hacer clic, manda a ?s=1 con la imagen configurada
+    const easter = $('#easter');
+    if(easter){
+      easter.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const img = encodeURIComponent('media/sorpresa.png'); // cambia por tu ruta
+        location.href = `${location.pathname}?s=1&img=${img}`;
+      });
+    }
+  </script>
+</body>
+</html>
