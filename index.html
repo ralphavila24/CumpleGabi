@@ -60,6 +60,44 @@
     .surprise{min-height:100vh;display:grid;place-items:center;padding:12px}
     .surprise img{max-width:100%;max-height:85vh;border-radius:18px;border:1px solid rgba(255,255,255,.15);box-shadow:0 14px 34px rgba(0,0,0,.35)}
     .back{margin-top:12px;display:inline-block;font-weight:600;text-decoration:none;background:var(--ac2);color:#21152b;padding:8px 12px;border-radius:12px}
+
+    /* Mensaje final tras la cuenta regresiva */
+    .final-message{
+      display:none;
+      opacity:0;
+      transform: scale(.96);
+      font-weight:800;
+      font-size: clamp(28px, 6vw, 64px);
+      line-height:1.05;
+      text-align:center;
+      margin-top:14px;
+      background: linear-gradient(135deg, var(--ac), var(--ac2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: pop-in 900ms ease-out forwards;
+    }
+    .final-message.show{ display:block; }
+
+    @keyframes pop-in{
+      to{
+        opacity:1;
+        transform: scale(1);
+      }
+    }
+
+    /* Latido suave continuo después del pop-in */
+    .final-message.heartbeat{
+      animation: pop-in 900ms ease-out forwards, heartbeat 2.4s ease-in-out 1s infinite;
+    }
+    @keyframes heartbeat{
+      0%   { transform: scale(1); }
+      10%  { transform: scale(1.035); }
+      20%  { transform: scale(1); }
+      30%  { transform: scale(1.035); }
+      40%  { transform: scale(1); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -106,6 +144,11 @@ y que la vida a tu favor se juega.
         <div class="icon">⏳</div>
         <h3>Cuenta regresiva</h3>
         <div class="countdown" id="countdown"></div>
+
+        <!-- Mensaje final oculto -->
+        <div id="finalMessage" class="final-message" aria-hidden="true">
+          ¡Feliz cumpleaños, Gabi! 🎉🎂🥳
+        </div>
       </article>
 
       <article class="card tile deseos">
@@ -170,7 +213,7 @@ Te deseo un año lleno de salud, risas y metas cumplidas. Gracias por estar siem
 
     let ti=0, ci=0; const tw = $('#typewriter');
     function type(){
-      if(!tw) return; // si estamos en modo sorpresa, no hay tw
+      if(!tw) return; 
       const m = messages[ti];
       tw.textContent = m.slice(0, ++ci);
       if(ci<=m.length){ setTimeout(type, 40); }
@@ -179,17 +222,37 @@ Te deseo un año lleno de salud, risas y metas cumplidas. Gracias por estar siem
     type();
 
     // ===== Countdown =====
-    const DEFAULT_DATE = '2025-09-19'; // ya puedes fijarla aquí si quieres
+    const DEFAULT_DATE = '2025-09-19'; 
     const TARGET = params.get('d') || DEFAULT_DATE;
     const cd = $('#countdown');
+    let finished = false;
+    let timerId;
+
     function updateCountdown(){
       if(!cd) return;
-      cd.innerHTML = '';
-      if(!TARGET){ return; } // sin mensajes: ya no mostramos el tip
-      const TZ_OFFSET = '+02:00'; // España (CEST, UTC+02) en septiembre
+      const TZ_OFFSET = '+02:00'; 
       const target = (TARGET.includes('T') ? new Date(TARGET) : new Date(`${TARGET}T00:00:00${TZ_OFFSET}`));
-      const diff = target - new Date();
-      const past = diff < 0;
+      const now = new Date();
+      const diff = target - now;
+
+      // Llegó a 0
+      if(diff <= 0 && !finished){
+        finished = true;
+        alert('¡Feliz cumpleaños, Gabi! 🎉🎂🥳');
+        cd.style.display = 'none';
+        const fm = document.getElementById('finalMessage');
+        if(fm){
+          fm.classList.add('show');
+          fm.setAttribute('aria-hidden', 'false');
+          setTimeout(()=> fm.classList.add('heartbeat'), 50);
+        }
+        if(typeof spawn === 'function'){ spawn(160); }
+        clearInterval(timerId);
+        return;
+      }
+
+      // Render normal
+      cd.innerHTML = '';
       const ms = Math.abs(diff);
       const d = Math.floor(ms/86400000);
       const h = Math.floor(ms%86400000/3600000);
@@ -202,10 +265,10 @@ Te deseo un año lleno de salud, risas y metas cumplidas. Gracias por estar siem
         el.innerHTML = `<span class="num">${fmt(num)}</span>${label}`;
         cd.appendChild(el);
       });
-      if(past){ cd.insertAdjacentHTML('afterbegin','<span class="pill">¡Ya pasó! A celebrar todo el mes 🎉</span>'); }
     }
+
     updateCountdown();
-    setInterval(updateCountdown, 1000);
+    timerId = setInterval(updateCountdown, 1000);
 
     // Confetti
     const canvas = document.getElementById('confetti');
@@ -228,6 +291,7 @@ Te deseo un año lleno de salud, risas y metas cumplidas. Gracias por estar siem
       spawn(180); step();
       window.addEventListener('click',()=>spawn(60));
       window.addEventListener('scroll',()=>spawn(20));
+      window.spawn = spawn;
     }
 
     // Enlace escondido: sorpresa
@@ -239,7 +303,6 @@ Te deseo un año lleno de salud, risas y metas cumplidas. Gracias por estar siem
         location.href = `${location.pathname}?s=1&img=${img}`;
       });
     }
-
-      </script>
+  </script>
 </body>
 </html>
